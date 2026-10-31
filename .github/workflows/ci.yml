@@ -1,0 +1,25 @@
+name: CI
+on: { push: { branches: [main] }, pull_request: {} }
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_DB: sulu_test, POSTGRES_USER: sulu, POSTGRES_PASSWORD: sulu }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U sulu" --health-interval 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21, cache: maven }
+      - run: mvn -B test
+        working-directory: backend
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: web/package-lock.json }
+      - run: npm ci && npm run typecheck && npm test && npm run build
+        working-directory: web

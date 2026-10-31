@@ -24,7 +24,7 @@ sulu:
     secret: ${SULU_JWT_SECRET:}            # >= 32 bytes; required outside the dev profile
     access-ttl-minutes: 60
     refresh-ttl-days: 30
-  cors-origins: ${SULU_CORS_ORIGINS:http://localhost:5173}
+  cors-origins: ${SULU_CORS_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
   storage:
     dir: ${SULU_STORAGE_DIR:./uploads}
     max-bytes: 5242880

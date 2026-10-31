@@ -17,3 +17,7 @@ SULU — Beauty Super App (маркетплейс). Три части: SULU Cust
 
 ## Команды
 См. README.md.
+
+## Состояние проекта (обновлено)
+Реализовано: backend (35 интеграционных тестов), web (клиент + бизнес + админ + мастер), e2e-сценарий `web/e2e/journey.mjs`. Честный список симуляций/ограничений — в README.md.
+Gotchas: не использовать `pkill -f "spring-boot:run"` в той же команде (убивает shell, код 144); тесты backend требуют БД `sulu_test`; CORS dev-origin: localhost и 127.0.0.1:5173.
