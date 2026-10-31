@@ -1,0 +1,17 @@
+# Local/dev stack: docker compose up --build   (web on :5173 is started separately with `npm run dev`)
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_DB: sulu, POSTGRES_USER: sulu, POSTGRES_PASSWORD: sulu }
+    ports: ["5432:5432"]
+    volumes: [dbdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U sulu"], interval: 5s, retries: 10 }
+  backend:
+    build: ./backend
+    depends_on: { db: { condition: service_healthy } }
+    environment:
+      SPRING_PROFILES_ACTIVE: dev          # DEV ONLY: demo data, simulated payments, dev secrets
+      SULU_DB_URL: jdbc:postgresql://db:5432/sulu
+    ports: ["8080:8080"]
+    volumes: [uploads:/data/uploads]
+volumes: { dbdata: {}, uploads: {} }
