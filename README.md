@@ -12,6 +12,11 @@ SULU («сұлу» — «красивая») — маркетплейс крас
 | Кабинет мастера | `/pro` | мастер (по приглашению) |
 | **SULU Admin** | `/admin` | администратор платформы |
 
+## Скриншоты
+Полноразмерные снимки всех экранов (клиент, бизнес, мастер, админ) — в [`docs/screenshots/`](docs/screenshots) (генерируются `node web/e2e/screenshots.mjs`).
+Обзорные листы: [клиент 1](docs/screenshots/_sheet-customer-1.png) · [клиент 2](docs/screenshots/_sheet-customer-2.png) · [клиент 3](docs/screenshots/_sheet-customer-3.png) · [бизнес](docs/screenshots/_sheet-business.png) · [админ](docs/screenshots/_sheet-admin.png).
+Это демо-данные (вымышленные бизнесы).
+
 ## Реальное состояние (честно)
 
 **Работает и проверено** (автотесты + браузерный сценарий): регистрация/вход/refresh/сброс пароля, каталог, поиск и фильтры, профили салонов/мастеров/услуг,
