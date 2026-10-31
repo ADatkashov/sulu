@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: ${SULU_TEST_DB_URL:jdbc:postgresql://localhost:5432/sulu_test}
+    username: ${SULU_DB_USER:sulu}
+    password: ${SULU_DB_PASSWORD:sulu}
+sulu:
+  jwt.secret: test-secret-test-secret-test-secret-123456
+  payments:
+    webhook-secret: test-webhook-secret
+    simulated-enabled: true
+  seed-demo: false
+  storage.dir: ./target/test-uploads
+  rate-limit.auth-per-minute: 100000
