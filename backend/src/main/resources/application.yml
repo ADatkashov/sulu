@@ -1,0 +1,39 @@
+spring:
+  application.name: sulu
+  datasource:
+    url: ${SULU_DB_URL:jdbc:postgresql://localhost:5432/sulu}
+    username: ${SULU_DB_USER:sulu}
+    password: ${SULU_DB_PASSWORD:sulu}
+  flyway:
+    enabled: true
+  servlet.multipart.max-file-size: 5MB
+  servlet.multipart.max-request-size: 6MB
+  jackson:
+    default-property-inclusion: non_null
+    serialization.write-dates-as-timestamps: false
+server:
+  port: ${PORT:8080}
+  error.include-message: never
+management:
+  endpoints.web.exposure.include: health,info
+  endpoint.health.probes.enabled: true
+springdoc:
+  swagger-ui.path: /swagger-ui.html
+sulu:
+  jwt:
+    secret: ${SULU_JWT_SECRET:}            # >= 32 bytes; required outside the dev profile
+    access-ttl-minutes: 60
+    refresh-ttl-days: 30
+  cors-origins: ${SULU_CORS_ORIGINS:http://localhost:5173}
+  storage:
+    dir: ${SULU_STORAGE_DIR:./uploads}
+    max-bytes: 5242880
+  payments:
+    webhook-secret: ${SULU_PAYMENT_WEBHOOK_SECRET:}
+    simulated-enabled: ${SULU_PAYMENTS_SIMULATED:false}
+  admin:
+    email: ${SULU_ADMIN_EMAIL:}
+    password: ${SULU_ADMIN_PASSWORD:}
+  seed-demo: ${SULU_SEED_DEMO:false}
+  rate-limit:
+    auth-per-minute: ${SULU_AUTH_RATE_LIMIT:20}

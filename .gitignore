@@ -1,0 +1,10 @@
+target/
+node_modules/
+dist/
+.env
+*.log
+backend/uploads/
+web/test-results/
+web/playwright-report/
+.idea/
+.vscode/

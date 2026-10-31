@@ -1,0 +1,10 @@
+# Local development ONLY. Never use these values in production.
+sulu:
+  jwt.secret: dev-only-secret-change-me-dev-only-secret-change-me
+  payments:
+    webhook-secret: dev-webhook-secret
+    simulated-enabled: true
+  seed-demo: true
+  admin:
+    email: admin@sulu.local
+    password: Admin12345!
