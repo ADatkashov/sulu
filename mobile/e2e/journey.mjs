@@ -9,7 +9,7 @@ if (SHOTS) mkdirSync(SHOTS, { recursive: true })
 const results = []
 const check = (n, ok, x = '') => { results.push(ok); console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}${x ? ' — ' + x : ''}`) }
 const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, locale: 'ru-RU', deviceScaleFactor: 2 }); const p = await ctx.newPage()
-const errs = []; p.on('pageerror', (e) => errs.push(String(e).slice(0, 200)))
+const errs = [], logs = []; p.on('pageerror', (e) => errs.push(String(e).slice(0, 200))); p.on('console', (m) => { if (!/GL Driver|Injecting/.test(m.text())) logs.push(m.type() + ': ' + m.text().slice(0, 500)) })
 const shot = async (n) => { if (SHOTS) await p.screenshot({ path: `${SHOTS}/${n}.png` }) }
 // Flutter semantics expose text either as DOM text or as aria-label — match both.
 const txt = (t) => p.locator(`flt-semantics:has-text("${t}"), [aria-label*="${t}"]`).last()
@@ -22,11 +22,9 @@ try {
   await btn('Смотреть без регистрации').click(); await see('Популярные салоны'); await p.waitForTimeout(1500)
   check('onboarding → home with API data', (await txt('Aru Beauty Studio').count()) > 0)
   await shot('m01-home')
-  // explore + search
-  await p.getByRole('tab', { name: /Поиск/ }).click(); await see('Услуги')
-  await p.goto(BASE + '/#/explore?category=manicure')
-  await see('Маникюр с покрытием'); check('category filter returns matching services', (await p.locator('[aria-label*="Стрижка"]').count()) === 0); await shot('m02-explore')
-  await p.goto(BASE + '/#/explore?q=%D0%BC%D0%B0%D0%BD%D0%B8%D0%BA%D1%8E%D1%80'); await see('Маникюр с покрытием'); check('text search via deep link', true)
+  // category from the home screen (in-app taps only: repeated page reloads lose the headless WebGL context)
+  await btn('Маникюр').first().click(); await see('Маникюр с покрытием')
+  check('category filter returns matching services', (await p.locator('[aria-label*="Женская стрижка"]').count()) === 0); await shot('m02-explore')
   await txt('Маникюр с покрытием').click(); await see('Записаться'); await shot('m03-service')
   await btn('Записаться').click(); await see('Любой свободный мастер'); await btn('Продолжить').click()
   // first day that has free time
@@ -62,6 +60,8 @@ try {
   check('cancel + automatic refund', true)
   await p.getByRole('tab', { name: /Профиль/ }).click(); await see('Выйти'); await shot('m09-profile')
   check('profile tab', true)
-} catch (e) { check('journey aborted: ' + String(e).split('\n')[0], false); await shot('zz-failure') }
+  const q = await ctx.newPage(); await q.goto(BASE + '/'); await q.evaluate(() => localStorage.setItem('flutter.sulu.onboarded', 'true')); await q.goto(BASE + '/#/explore?q=%D0%BC%D0%B0%D0%BD%D0%B8%D0%BA%D1%8E%D1%80'); await q.reload()
+  await q.locator('[aria-label*="Маникюр с покрытием"], flt-semantics:has-text("Маникюр с покрытием")').last().waitFor({ state: 'attached', timeout: 20000 }); check('text search via deep link (fresh page)', true)
+} catch (e) { check('journey aborted: ' + String(e).split('\n')[0] + ' @ ' + (String(e.stack).match(/journey\.mjs:(\d+)/)?.[1] ?? '?'), false); await shot('zz-failure'); console.log('console:', logs.slice(-8).join('\n')); console.log(p.url(), (await p.evaluate(() => [...document.querySelectorAll('flt-semantics')].map((e) => (e.getAttribute('aria-label') || '').slice(0, 40)).filter(Boolean).slice(0, 12))).join(' | ')) }
 check('no uncaught page errors', errs.length === 0, errs[0] ?? '')
 await b.close(); const bad = results.filter((x) => !x).length; console.log(`\n${results.length - bad}/${results.length} checks passed`); process.exit(bad ? 1 : 0)

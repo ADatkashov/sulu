@@ -16,8 +16,12 @@ String money(num minor, String currency, String locale) {
 
 tz.TZDateTime inZone(String iso, String? zone) {
   initTz();
-  return tz.TZDateTime.from(DateTime.parse(iso), tz.getLocation(zone ?? 'Asia/Almaty'));
+  final loc = (zone == null || zone == 'UTC') ? (zone == 'UTC' ? tz.UTC : tz.getLocation('Asia/Almaty')) : tz.getLocation(zone);
+  return tz.TZDateTime.from(DateTime.parse(iso), loc);
 }
+
+/// Short weekday name of a yyyy-MM-dd calendar date (no time zone involved).
+String weekdayShort(String ymd, String locale) => DateFormat('EEE', _loc(locale)).format(DateTime.parse(ymd));
 
 String fmtTime(String iso, String? zone) => DateFormat('HH:mm').format(inZone(iso, zone));
 String fmtDate(String iso, String locale, String? zone, {bool weekday = true}) =>

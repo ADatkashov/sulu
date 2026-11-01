@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +15,7 @@ import 'package:sulu_app/state/app_state.dart';
 http.Response json(Object o, [int status = 200]) => http.Response.bytes(utf8.encode(jsonEncode(o)), status, headers: {'content-type': 'application/json'});
 
 void main() {
+  setUpAll(() => initializeDateFormatting());
   group('i18n', () {
     test('lookup falls back kk → ru → en and fills params', () {
       expect(tr('ru', 'nav.home'), 'Главная');

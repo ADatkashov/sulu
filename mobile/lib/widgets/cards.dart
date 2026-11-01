@@ -46,7 +46,7 @@ class ServiceCard extends StatelessWidget {
         Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 10, children: [Row(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.schedule, size: 13, color: C.muted), Text(' ${s['durationMin']} ${a.t('common.min')}', style: const TextStyle(color: C.muted, fontSize: 12))]),
           Stars(num.tryParse('${s['businessRating']}') ?? 0, count: s['businessRatingCount'])]),
       ])),
-      const SizedBox(width: 8), PriceText(s['priceMinor'], s['currency'], from: s['priceFrom'] == true),
+      const SizedBox(width: 8), ConstrainedBox(constraints: const BoxConstraints(maxWidth: 112), child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: PriceText(s['priceMinor'], s['currency'], from: s['priceFrom'] == true))),
     ]));
   }
 }

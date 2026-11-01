@@ -6,7 +6,7 @@ import '../core/format.dart';
 import '../core/theme.dart';
 import '../widgets/common.dart';
 
-String _newKey() => '${DateTime.now().microsecondsSinceEpoch}-${Random().nextInt(1 << 32)}';
+String _newKey() => '${DateTime.now().microsecondsSinceEpoch}-${Random().nextInt(0x7fffffff)}';
 
 class BookPage extends StatefulWidget { const BookPage(this.serviceId, {super.key, this.pro}); final int serviceId; final int? pro; @override State<BookPage> createState() => _BookPageState(); }
 class _BookPageState extends State<BookPage> {
@@ -61,7 +61,7 @@ class _BookPageState extends State<BookPage> {
             Text(a.t('book.chooseDate'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)), const SizedBox(height: 10),
             SizedBox(height: 74, child: ListView(scrollDirection: Axis.horizontal, children: [for (final d in days) Padding(padding: const EdgeInsets.only(right: 8), child: InkWell(borderRadius: BorderRadius.circular(16), onTap: () { setState(() => date = d); loadSlots(s); },
               child: Container(width: 58, decoration: BoxDecoration(color: date == d ? C.primary : Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: date == d ? C.primary : C.border, width: 1.5)), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(fmtDate('${d}T12:00:00Z', a.locale, 'UTC').split(',').first, style: TextStyle(fontSize: 11, color: date == d ? Colors.white70 : C.muted)), Text('${int.parse(d.substring(8))}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: date == d ? Colors.white : C.text))]))))])),
+                Text(weekdayShort(d, a.locale), style: TextStyle(fontSize: 11, color: date == d ? Colors.white70 : C.muted)), Text('${int.parse(d.substring(8))}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: date == d ? Colors.white : C.text))]))))])),
             const SizedBox(height: 16), Text(a.t('book.chooseTime'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)), const SizedBox(height: 10),
             if (slotsErr != null) EmptyView(a.t('error.title'), text: a.err(slotsErr!), icon: Icons.error_outline, action: SBtn(a.t('common.retry'), kind: 'secondary', onPressed: () => loadSlots(s)))
             else if (slots == null) const Skel(h: 120)

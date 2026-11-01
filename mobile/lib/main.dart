@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/api.dart';
@@ -20,6 +21,7 @@ import 'widgets/common.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initTz();
+  await initializeDateFormatting(); // locale data for kk_KZ / ru_RU / en_GB date formats
   // E2E/accessibility tooling: --dart-define=SEMANTICS=true keeps the semantics tree always on.
   if (const bool.fromEnvironment('SEMANTICS')) SemanticsBinding.instance.ensureSemantics();
   final prefs = await SharedPreferences.getInstance();
