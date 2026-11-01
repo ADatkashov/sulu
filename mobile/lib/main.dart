@@ -45,7 +45,7 @@ GoRouter buildRouter(AppState s) => GoRouter(
     GoRoute(path: '/salon/:id', builder: (_, st) => SalonPage(int.parse(st.pathParameters['id']!))),
     GoRoute(path: '/master/:id', builder: (_, st) => MasterPage(int.parse(st.pathParameters['id']!))),
     GoRoute(path: '/service/:id', builder: (_, st) => ServicePage(int.parse(st.pathParameters['id']!))),
-    GoRoute(path: '/book/:id', builder: (_, st) => BookPage(int.parse(st.pathParameters['id']!), pro: int.tryParse(st.uri.queryParameters['pro'] ?? ''))),
+    GoRoute(path: '/book/:id', builder: (_, st) => BookPage(int.parse(st.pathParameters['id']!), pro: int.tryParse(st.uri.queryParameters['pro'] ?? ''), slot: st.uri.queryParameters['slot'])),
     GoRoute(path: '/booked/:id', builder: (_, st) => BookedPage(int.parse(st.pathParameters['id']!), pay: st.uri.queryParameters['pay'] == '1')),
     GoRoute(path: '/bookings/:id', builder: (_, st) => BookingDetail(int.parse(st.pathParameters['id']!))),
     GoRoute(path: '/notifications', builder: (_, __) => const NotificationsPage()),

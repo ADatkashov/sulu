@@ -32,7 +32,7 @@ try {
   const pickDay = async (skip = 0) => {
     let seen = 0
     for (let i = 0; i < 14; i++) {
-      const days = p.getByRole('button', { name: /^(Пн|Вт|Ср|Чт|Пт|Сб|Вс|\w{2})\s*\d{1,2}$/ })
+      const days = p.getByRole('button', { name: /^[^\d\s]{2}\.?\s*\d{1,2}$/u })
       const n = await days.count(); if (i >= n) break
       await days.nth(i).click(); await p.waitForTimeout(700)
       if (await p.getByRole('button', { name: /^\d{2}:\d{2}$/ }).count()) { if (seen++ >= skip) return }

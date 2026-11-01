@@ -8,10 +8,10 @@ import '../widgets/common.dart';
 
 String _newKey() => '${DateTime.now().microsecondsSinceEpoch}-${Random().nextInt(0x7fffffff)}';
 
-class BookPage extends StatefulWidget { const BookPage(this.serviceId, {super.key, this.pro}); final int serviceId; final int? pro; @override State<BookPage> createState() => _BookPageState(); }
+class BookPage extends StatefulWidget { const BookPage(this.serviceId, {super.key, this.pro, this.slot}); final int serviceId; final int? pro; final String? slot; @override State<BookPage> createState() => _BookPageState(); }
 class _BookPageState extends State<BookPage> {
-  late int step = widget.pro != null ? 1 : 0; late int? proId = widget.pro; // null == any master
-  String? date; List<Map>? slots; Object? slotsErr; Map? slot; List alts = [];
+  late int step = widget.slot != null ? 2 : (widget.pro != null ? 1 : 0); late int? proId = widget.pro; // null == any master
+  String? date; List<Map>? slots; Object? slotsErr; late Map? slot = widget.slot == null ? null : {'start': widget.slot, 'end': widget.slot, 'professionalId': widget.pro}; List alts = [];
   final note = TextEditingController(), promo = TextEditingController(); bool online = false, busy = false; String error = ''; String idem = _newKey();
 
   Future<void> loadSlots(Map s) async {
@@ -23,7 +23,7 @@ class _BookPageState extends State<BookPage> {
   }
   Future<void> confirm(Map s) async {
     final a = appRead(context);
-    if (!a.loggedIn) { goLogin(context, '/book/${widget.serviceId}${proId != null ? '?pro=$proId' : ''}'); return; }
+    if (!a.loggedIn) { goLogin(context, '/book/${widget.serviceId}${qs({'pro': proId, 'slot': slot!['start']})}'); return; }
     setState(() { busy = true; error = ''; alts = []; });
     try {
       final b = await a.api.post('/api/bookings', {'serviceId': s['id'], if (proId != null) 'professionalId': proId, 'startAt': slot!['start'], if (note.text.isNotEmpty) 'note': note.text, if (promo.text.isNotEmpty) 'promoCode': promo.text}, {'Idempotency-Key': idem});
@@ -40,7 +40,7 @@ class _BookPageState extends State<BookPage> {
     final a = app(context);
     return Load<Map>(fn: () async => Map.from(await a.api.get('/api/services/${widget.serviceId}')), builder: (c, s, _) {
       final tz = s['timezone'] ?? 'Asia/Almaty'; final days = [for (var i = 0; i < 21; i++) ymdInZone(i, tz)];
-      if (date == null) { date = days.first; WidgetsBinding.instance.addPostFrameCallback((_) => loadSlots(s)); }
+      if (date == null) { date = widget.slot != null ? ymdInZone(0, tz, DateTime.parse(widget.slot!)) : days.first; WidgetsBinding.instance.addPostFrameCallback((_) { if (widget.slot == null) loadSlots(s); }); }
       final pros = (s['professionals'] as List).cast<Map>();
       final assigned = slot == null ? null : pros.where((p) => p['id'] == slot!['professionalId']).firstOrNull;
       final pro = proId == null ? null : pros.where((p) => p['id'] == proId).firstOrNull;
