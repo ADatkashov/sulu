@@ -1,0 +1,88 @@
+name: Android APK
+
+# Собирает APK клиента SULU (React PWA, обёрнутый в Capacitor). Debug-подписанный:
+# годится для внутреннего QA, не для Google Play. Ничего не деплоит.
+# push в main -> APK в Artifacts (14 дней). Ручной запуск с publish_release=true ->
+# ещё и GitHub Release (pre-release) с постоянной ссылкой на APK.
+on:
+  push:
+    branches: [main]
+    paths: ["web/**", ".github/workflows/android-apk.yml"]
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: "URL бэкенда без /api (например https://sulu-api.example.com). Пусто — repo variable SULU_API_URL."
+        required: false
+        type: string
+      publish_release:
+        description: "Опубликовать GitHub Release с APK"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: web/package-lock.json }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: npm ci
+
+      # В APK нет dev-прокси Vite, поэтому адрес бэкенда вшивается при сборке.
+      - name: Build web
+        env:
+          VITE_API_URL: ${{ inputs.api_url || vars.SULU_API_URL }}
+        run: |
+          if [ -z "$VITE_API_URL" ]; then
+            echo "::warning::SULU_API_URL не задан — APK будет обращаться к относительным путям и не найдёт бэкенд. Задайте repo variable SULU_API_URL или input api_url."
+          fi
+          npm run build
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: web/android
+        run: chmod +x gradlew && ./gradlew --no-daemon assembleDebug
+
+      - name: Rename APK
+        id: apk
+        run: |
+          name="sulu-customer-${GITHUB_SHA::7}.apk"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$name"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sulu-customer-apk
+          path: web/${{ steps.apk.outputs.name }}
+          retention-days: 14
+
+      - name: Publish GitHub Release
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_release }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: customer-apk-${{ github.run_number }}
+          name: "SULU Customer APK (build ${{ github.run_number }})"
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          files: web/${{ steps.apk.outputs.name }}
+          body: |
+            Debug-подписанный APK клиента SULU из коммита `${{ github.sha }}`. Только для тестирования.

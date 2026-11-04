@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SULU</string>
+    <string name="title_activity_main">SULU</string>
+    <string name="package_name">app.sulu.customer</string>
+    <string name="custom_url_scheme">app.sulu.customer</string>
+</resources>

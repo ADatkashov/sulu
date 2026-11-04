@@ -81,3 +81,8 @@ cd web && node e2e/journey.mjs        # сквозной сценарий в Chr
 
 ## Что нужно для продакшена (внешнее)
 Платёжный провайдер (карты/Apple Pay/Google Pay/Kaspi и т.д.) и его webhook-секрет; email/SMS/push провайдеры; S3-совместимое хранилище; секреты `SULU_JWT_SECRET`, БД; домен/TLS; лицензированные фото; юридическая оценка соответствия (GDPR/закон РК о персональных данных) — не проводилась.
+
+## Android APK (CI)
+Клиент (`web/`) упакован в Android через Capacitor (`web/android/`). Workflow `.github/workflows/android-apk.yml`
+собирает debug-подписанный APK на push в `main` (Artifacts) и по ручному запуску (`publish_release` → GitHub Release).
+Адрес бэкенда вшивается при сборке: repo variable `SULU_API_URL` или input `api_url`. Release-подпись для Google Play не настроена.
