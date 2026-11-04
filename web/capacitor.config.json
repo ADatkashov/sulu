@@ -1,0 +1,6 @@
+{
+  "appId": "app.sulu.customer",
+  "appName": "SULU",
+  "webDir": "dist",
+  "android": { "allowMixedContent": false }
+}
